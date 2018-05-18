@@ -29,6 +29,8 @@ import com.hubspot.jinjava.interpret.RenderResult;
 import com.hubspot.jinjava.interpret.TemplateError;
 import com.hubspot.jinjava.interpret.TemplateError.ErrorItem;
 import com.hubspot.jinjava.interpret.TemplateError.ErrorReason;
+import com.hubspot.jinjava.lib.fn.ELFunctionDefinition;
+import com.hubspot.jinjava.lib.fn.MacroFunction;
 import com.hubspot.jinjava.objects.PyWrapper;
 import com.hubspot.jinjava.objects.date.PyishDate;
 
@@ -431,6 +433,43 @@ public class ExpressionResolverTest {
     final RenderResult renderResult = jinjava.renderForResult(template, context, config);
     assertThat(renderResult.getOutput()).isEqualTo("1 2 3 4 \n12000");
     assertThat(renderResult.getContext().getResolvedFunctions()).hasSameElementsAs(ImmutableSet.of(":range", ":unixtimestamp"));
+  }
+
+  @Test
+  public void itResolvesBuiltInFunctions() {
+    Object val = interpreter.resolveELExpression("range", -1);
+    ELFunctionDefinition fn = (ELFunctionDefinition) val;
+    assertThat(fn.getName()).isEqualTo(":range");
+  }
+
+  @Test
+  public void itResolvesMacros() {
+    interpreter.render("{% macro mymacro() %}{% endmacro %}");
+    Object val = interpreter.resolveELExpression("mymacro", -1);
+    MacroFunction fn = (MacroFunction) val;
+    assertThat(fn.getName()).isEqualTo("mymacro");
+  }
+
+  private static class MyTestClass {
+    public static int MyFn() {
+      return 42;
+    }
+  }
+
+  @Test
+  public void itResolvesUserDefinedFunctionsWithNamespace() {
+    context.registerFunction(new ELFunctionDefinition("my", "fn", MyTestClass.class, "MyFn"));
+    Object val = interpreter.resolveELExpression("my:fn", -1);
+    ELFunctionDefinition fn = (ELFunctionDefinition) val;
+    assertThat(fn.getName()).isEqualTo("my:fn");
+  }
+
+  @Test
+  public void itResolvesUserDefinedFunctionsWithoutNamespace() {
+    context.registerFunction(new ELFunctionDefinition("", "fn", MyTestClass.class, "MyFn"));
+    Object val = interpreter.resolveELExpression("fn", -1);
+    ELFunctionDefinition fn = (ELFunctionDefinition) val;
+    assertThat(fn.getName()).isEqualTo(":fn");
   }
 
   @Test

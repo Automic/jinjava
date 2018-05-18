@@ -170,6 +170,16 @@ public class ExtendedSyntaxBuilderTest {
   }
 
   @Test
+  public void mapLiteralIdentifiers() {
+    context.put("key", "foo");
+    context.put("value", "bar");
+    Object out = val("{key:value}");
+    assertThat(out).isInstanceOf(Map.class);
+    Map<String, Object> map = (Map<String, Object>) out;
+    assertThat(map).containsExactly(entry("foo", "bar"));
+  }
+
+  @Test
   public void mapLiteralFuncCall() {
     context.put("key", "numbers");
     Object out = val("{key:range(3)}");

@@ -34,6 +34,7 @@ import de.odysseus.el.tree.impl.ast.AstBinary;
 import de.odysseus.el.tree.impl.ast.AstBracket;
 import de.odysseus.el.tree.impl.ast.AstDot;
 import de.odysseus.el.tree.impl.ast.AstFunction;
+import de.odysseus.el.tree.impl.ast.AstIdentifier;
 import de.odysseus.el.tree.impl.ast.AstNested;
 import de.odysseus.el.tree.impl.ast.AstNode;
 import de.odysseus.el.tree.impl.ast.AstNull;
@@ -209,6 +210,10 @@ public class ExtendedParser extends Parser {
         String s = k.toString();
         v = function(StringUtils.substringAfter(s, ":"), (AstParameters) k.getChild(0));
         k = identifier(StringUtils.substringBefore(s, ":"));
+      } else if (k instanceof AstIdentifier && getToken().getSymbol() != COLON && k.toString().contains(":")) {
+        String s = k.toString();
+        k = identifier(StringUtils.substringBefore(s, ":"));
+        v = identifier(StringUtils.substringAfter(s, ":"));
       } else {
         consumeToken(COLON);
         v = expr(true);
@@ -247,7 +252,7 @@ public class ExtendedParser extends Parser {
     switch (getToken().getSymbol()) {
     case IDENTIFIER:
       String name = consumeToken().getImage();
-      if (getToken().getSymbol() == COLON && lookahead(0).getSymbol() == IDENTIFIER && lookahead(1).getSymbol() == LPAREN) { // ns:f(...)
+      if (getToken().getSymbol() == COLON && lookahead(0).getSymbol() == IDENTIFIER) { // ns:f
         consumeToken();
         name += ":" + getToken().getImage();
         consumeToken();

@@ -156,6 +156,15 @@ public class JinjavaInterpreterResolver extends SimpleResolver {
         if (base == null) {
           // Look up property in context.
           value = interpreter.retraceVariable((String) property, interpreter.getLineNumber(), -1);
+          if (value == null) {
+            value = interpreter.getContext().getGlobalMacro((String) property);
+            if (value == null) {
+              value = interpreter.getContext().getFunction((String) property);
+              if (value == null) {
+                value = interpreter.getContext().getFunction(":" + (String) property);
+              }
+            }
+          }
         } else {
           // Get property of base object.
           try {
