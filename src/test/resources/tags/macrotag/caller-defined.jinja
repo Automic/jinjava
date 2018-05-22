@@ -1,0 +1,12 @@
+{% macro inner() %}
+inner: {{ caller is defined}}
+{% endmacro %}
+
+{% macro outer() %}
+outer: {{ caller is defined }}
+{{ inner() }}
+{% endmacro %}
+
+{% call outer() %}
+something
+{% endcall %}

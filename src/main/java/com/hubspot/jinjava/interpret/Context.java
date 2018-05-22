@@ -143,13 +143,15 @@ public class Context extends ScopeMap<String, Object> {
   }
 
   public MacroFunction getGlobalMacro(String identifier) {
-    MacroFunction fn = getGlobalMacros().get(identifier);
-
-    if (fn == null && parent != null) {
-      fn = parent.getGlobalMacro(identifier);
+    if (getGlobalMacros().containsKey(identifier)) {
+      return getGlobalMacros().get(identifier);
     }
 
-    return fn;
+    if (parent != null) {
+      return parent.getGlobalMacro(identifier);
+    }
+
+    return null;
   }
 
   public boolean isGlobalMacro(String identifier) {

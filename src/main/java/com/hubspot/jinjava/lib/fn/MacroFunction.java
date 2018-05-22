@@ -45,6 +45,7 @@ public class MacroFunction extends AbstractCallableMethod {
   @Override
   public Object doEvaluate(Map<String, Object> argMap, Map<String, Object> kwargMap, List<Object> varArgs) {
     JinjavaInterpreter interpreter = JinjavaInterpreter.getCurrent();
+    boolean hideCaller = (!interpreter.getContext().getGlobalMacros().containsKey("caller") && interpreter.getContext().isGlobalMacro("caller"));
 
     try (InterpreterScopeClosable c = interpreter.enterScope()) {
       for (Map.Entry<String, Object> scopeEntry : localContextScope.getScope().entrySet()) {
@@ -53,6 +54,12 @@ public class MacroFunction extends AbstractCallableMethod {
         } else {
           interpreter.getContext().put(scopeEntry.getKey(), scopeEntry.getValue());
         }
+      }
+
+      MacroFunction caller = null;
+      if (hideCaller) {
+        caller = interpreter.getContext().getGlobalMacros().get("caller");
+        interpreter.getContext().getGlobalMacros().put("caller", null);
       }
 
       // named parameters
@@ -68,6 +75,10 @@ public class MacroFunction extends AbstractCallableMethod {
 
       for (Node node : content) {
         result.append(node.render(interpreter));
+      }
+
+      if (hideCaller) {
+        interpreter.getContext().getGlobalMacros().put("caller", caller);
       }
 
       return result.toString();

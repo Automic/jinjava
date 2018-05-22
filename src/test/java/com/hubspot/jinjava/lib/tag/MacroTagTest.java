@@ -100,6 +100,15 @@ public class MacroTagTest {
   }
 
   @Test
+  public void testCallerDefined() throws IOException {
+    String template = Resources.toString(Resources.getResource("tags/macrotag/caller-defined.jinja"), StandardCharsets.UTF_8);
+    String out = interpreter.render(template);
+    assertThat(interpreter.getErrors()).isEmpty();
+    assertThat(out).contains("outer: true");
+    assertThat(out).contains("inner: false");
+  }
+
+  @Test
   public void testMacroUsedInForLoop() throws Exception {
     Map<String, Object> bindings = new HashMap<>();
     bindings.put("widget_data", ImmutableMap.of(
