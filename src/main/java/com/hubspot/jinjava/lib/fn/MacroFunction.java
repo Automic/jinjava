@@ -57,8 +57,12 @@ public class MacroFunction extends AbstractCallableMethod {
       }
 
       MacroFunction caller = null;
+      boolean hadCaller = false;
       if (hideCaller) {
-        caller = interpreter.getContext().getGlobalMacros().get("caller");
+        hadCaller = interpreter.getContext().getGlobalMacros().containsKey("caller");
+        if (hadCaller) {
+          caller = interpreter.getContext().getGlobalMacros().get("caller");
+        }
         interpreter.getContext().getGlobalMacros().put("caller", null);
       }
 
@@ -78,7 +82,11 @@ public class MacroFunction extends AbstractCallableMethod {
       }
 
       if (hideCaller) {
-        interpreter.getContext().getGlobalMacros().put("caller", caller);
+        if (hadCaller) {
+          interpreter.getContext().getGlobalMacros().put("caller", caller);
+        } else {
+          interpreter.getContext().getGlobalMacros().remove("caller");
+        }
       }
 
       return result.toString();

@@ -2,11 +2,16 @@
 inner: {{ caller is defined}}
 {% endmacro %}
 
+{% macro inner2(arg) %}
+inner2: {{ arg }}
+{% endmacro %}
+
 {% macro outer() %}
 outer: {{ caller is defined }}
 {{ inner() }}
+{{ inner2(caller()) }}
 {% endmacro %}
 
-{% call outer() %}
+{% call outer() -%}
 something
-{% endcall %}
+{%- endcall %}

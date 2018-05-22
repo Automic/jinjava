@@ -106,6 +106,7 @@ public class MacroTagTest {
     assertThat(interpreter.getErrors()).isEmpty();
     assertThat(out).contains("outer: true");
     assertThat(out).contains("inner: false");
+    assertThat(out).contains("inner2: something");
   }
 
   @Test
