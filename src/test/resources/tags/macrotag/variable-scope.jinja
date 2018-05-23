@@ -1,0 +1,9 @@
+{% macro setvar() %}
+{% set foo="wrong" %}
+{{ caller() }}
+{% endmacro %}
+
+{% set foo="right" %}
+{% call setvar() %}
+foo={{ foo }}
+{% endcall %}

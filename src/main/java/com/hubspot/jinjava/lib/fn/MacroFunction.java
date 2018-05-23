@@ -47,13 +47,10 @@ public class MacroFunction extends AbstractCallableMethod {
     JinjavaInterpreter interpreter = JinjavaInterpreter.getCurrent();
 
     try (InterpreterScopeClosable c = interpreter.enterScope()) {
-      for (Map.Entry<String, Object> scopeEntry : localContextScope.getScope().entrySet()) {
-        if (scopeEntry.getValue() instanceof MacroFunction) {
-          interpreter.getContext().addGlobalMacro((MacroFunction) scopeEntry.getValue());
-        } else {
-          interpreter.getContext().put(scopeEntry.getKey(), scopeEntry.getValue());
-        }
+      if (caller) {
+        duplicateLocalContext(localContextScope.getParent());
       }
+      duplicateLocalContext(localContextScope);
 
       // named parameters
       for (Map.Entry<String, Object> argEntry : argMap.entrySet()) {
@@ -84,6 +81,17 @@ public class MacroFunction extends AbstractCallableMethod {
 
   public boolean isCaller() {
     return caller;
+  }
+
+  private void duplicateLocalContext(Context context) {
+    JinjavaInterpreter interpreter = JinjavaInterpreter.getCurrent();
+    for (Map.Entry<String, Object> scopeEntry : context.getScope().entrySet()) {
+      if (scopeEntry.getValue() instanceof MacroFunction) {
+        interpreter.getContext().addGlobalMacro((MacroFunction) scopeEntry.getValue());
+      } else {
+        interpreter.getContext().put(scopeEntry.getKey(), scopeEntry.getValue());
+      }
+    }
   }
 
 }

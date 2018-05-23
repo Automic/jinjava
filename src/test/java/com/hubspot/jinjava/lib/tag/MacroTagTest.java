@@ -100,6 +100,14 @@ public class MacroTagTest {
   }
 
   @Test
+  public void testVariableScope() throws IOException {
+    String template = Resources.toString(Resources.getResource("tags/macrotag/variable-scope.jinja"), StandardCharsets.UTF_8);
+    String out = interpreter.render(template).trim();
+    assertThat(interpreter.getErrors()).isEmpty();
+    assertThat(out).isEqualTo("foo=right");
+  }
+
+  @Test
   public void testMacroUsedInForLoop() throws Exception {
     Map<String, Object> bindings = new HashMap<>();
     bindings.put("widget_data", ImmutableMap.of(
