@@ -30,13 +30,7 @@ public class AstDict extends AstLiteral {
     for (Map.Entry<AstNode, AstNode> entry : dict.entrySet()) {
       String key;
 
-      if (entry.getKey() instanceof AstString) {
-        key = Objects.toString(entry.getKey().eval(bindings, context));
-      } else if (entry.getKey() instanceof AstIdentifier) {
-        key = ((AstIdentifier) entry.getKey()).getName();
-      } else {
-        throw new TemplateStateException("Dict key must be a string or identifier, was: " + entry.getKey());
-      }
+      key = Objects.toString(entry.getKey().eval(bindings, context));
 
       resolved.put(key, entry.getValue().eval(bindings, context));
     }

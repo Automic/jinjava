@@ -21,6 +21,8 @@ import javax.el.ELException;
 
 import com.google.common.collect.Lists;
 
+import org.apache.commons.lang3.StringUtils;
+
 import de.odysseus.el.tree.impl.Builder;
 import de.odysseus.el.tree.impl.Builder.Feature;
 import de.odysseus.el.tree.impl.Parser;
@@ -198,8 +200,19 @@ public class ExtendedParser extends Parser {
 
     AstNode k = expr(false);
     if (k != null) {
-      consumeToken(COLON);
-      AstNode v = expr(true);
+      AstNode v;
+      if (k instanceof AstMacroFunction && getToken().getSymbol() != COLON) {
+        // key: fn() - this is parsed as function call with namespace key
+
+        getFunctions().remove(getFunctions().size() - 1);
+
+        String s = k.toString();
+        v = function(StringUtils.substringAfter(s, ":"), (AstParameters) k.getChild(0));
+        k = identifier(StringUtils.substringBefore(s, ":"));
+      } else {
+        consumeToken(COLON);
+        v = expr(true);
+      }
 
       dict.put(k, v);
       while (getToken().getSymbol() == COMMA) {
