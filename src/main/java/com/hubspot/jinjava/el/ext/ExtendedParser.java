@@ -252,7 +252,7 @@ public class ExtendedParser extends Parser {
     switch (getToken().getSymbol()) {
     case IDENTIFIER:
       String name = consumeToken().getImage();
-      if (getToken().getSymbol() == COLON && lookahead(0).getSymbol() == IDENTIFIER) { // ns:f
+      if (getToken().getImage().equals(":") && lookahead(0).getSymbol() == IDENTIFIER) { // ns:f
         consumeToken();
         name += ":" + getToken().getImage();
         consumeToken();

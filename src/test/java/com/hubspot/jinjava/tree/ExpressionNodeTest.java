@@ -186,6 +186,13 @@ public class ExpressionNodeTest {
     assertThat(val("{{ a }}")).isEqualTo("foo &lt; bar");
   }
 
+  @Test
+  public void ifExpressionWithVariableConditionAndValue() throws Exception {
+    context.put("cond", false);
+    context.put("foo", "bar");
+    assertThat(val("{{ 'xxx' if cond else foo }}")).isEqualTo("bar");
+  }
+
   private String val(String jinja) {
     return parse(jinja).render(interpreter).getValue();
   }
